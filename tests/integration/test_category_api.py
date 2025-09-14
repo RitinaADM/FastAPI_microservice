@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from src.main import app
+# Используем правильный путь импорта после настройки sys.path
+from main import app
 
 
 @pytest.fixture

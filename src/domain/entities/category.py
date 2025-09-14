@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
-from domain.value_objects.category_id import CategoryId
-from domain.exceptions.category_exceptions import InvalidCategoryError
+# Fixed import paths to match the actual project structure
+from src.domain.value_objects.category_id import CategoryId
+from src.domain.exceptions.category_exceptions import InvalidCategoryError
 
 
 @dataclass

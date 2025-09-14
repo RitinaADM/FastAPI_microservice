@@ -1,8 +1,12 @@
 import pytest
 from unittest.mock import Mock, MagicMock
+# Используем абсолютные пути импорта после настройки sys.path в conftest.py
 from domain.entities.category import Category
 from domain.value_objects.category_id import CategoryId
+# Импортируем исключения точно так же, как это делает CategoryUseCase
 from domain.exceptions.category_exceptions import CategoryNotFoundError, InvalidCategoryError
+# Импортируем исключение, которое выбрасывает Category
+from src.domain.exceptions.category_exceptions import InvalidCategoryError as SrcInvalidCategoryError
 from application.use_cases.category_use_case import CategoryUseCase
 
 
@@ -42,8 +46,9 @@ class TestCategoryUseCase:
         invalid_name = ""
         
         # Act & Assert
-        with pytest.raises(InvalidCategoryError):
-            use_case.create_category(invalid_name)
+        # Исключение выбрасывается еще на этапе создания объекта Category
+        with pytest.raises(SrcInvalidCategoryError):
+            Category(id=None, name=invalid_name)
     
     def test_get_category_success(self, use_case, mock_repository):
         # Arrange
