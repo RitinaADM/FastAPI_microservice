@@ -127,7 +127,9 @@ category-service/
 ├── src/
 │   └── main.py
 ├── Dockerfile
+├── Dockerfile.test
 ├── docker-compose.yml
+├── Makefile
 ├── .env
 ├── requirements.txt
 ├── requirements-dev.txt
@@ -181,6 +183,35 @@ category-service/
    ```bash
    docker-compose down
    ```
+
+### Запуск тестов в Docker
+
+Для удобного запуска тестов в Docker мы предоставляем Makefile с несколькими командами:
+
+1. Запустить все тесты:
+   ```bash
+   make test
+   ```
+
+2. Запустить только unit-тесты:
+   ```bash
+   make test-unit
+   ```
+
+3. Запустить только интеграционные тесты:
+   ```bash
+   make test-integration
+   ```
+
+4. Запустить тесты с измерением покрытия кода:
+   ```bash
+   make test-coverage
+   ```
+
+Также можно запустить тесты напрямую через docker-compose:
+```bash
+docker-compose run --rm test-runner
+```
 
 ## Эндпоинты API
 

@@ -17,6 +17,24 @@ services:
     networks:
       - app-network
 
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    # This service is for running tests, not for continuous running
+    command: ["python", "-m", "pytest", "tests/", "-v"]
+
   mongodb:
     image: mongo:latest
     ports:
