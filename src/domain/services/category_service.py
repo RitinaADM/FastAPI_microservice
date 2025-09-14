@@ -17,3 +17,31 @@ class CategoryService:
         """Check if category can be deleted"""
         # A category with associated products cannot be deleted
         return not has_products
+    
+    def calculate_category_statistics(self, categories: List[Category]) -> dict:
+        """Calculate statistics for categories"""
+        if not categories:
+            return {
+                "total_count": 0,
+                "average_name_length": 0,
+                "longest_name": "",
+                "shortest_name": ""
+            }
+        
+        names = [cat.name for cat in categories if cat.name]
+        if not names:
+            return {
+                "total_count": len(categories),
+                "average_name_length": 0,
+                "longest_name": "",
+                "shortest_name": ""
+            }
+        
+        name_lengths = [len(name) for name in names]
+        
+        return {
+            "total_count": len(categories),
+            "average_name_length": sum(name_lengths) / len(name_lengths),
+            "longest_name": max(names, key=len),
+            "shortest_name": min(names, key=len)
+        }

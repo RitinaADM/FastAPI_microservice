@@ -142,3 +142,25 @@ class TestCategoryUseCase:
         # Act & Assert
         with pytest.raises(CategoryNotFoundError):
             use_case.delete_category(category_id)
+    
+    def test_get_category_statistics(self, use_case, mock_repository):
+        # Arrange
+        categories = [
+            Category(id=CategoryId.new(), name="Electronics", description="Electronic devices"),
+            Category(id=CategoryId.new(), name="Books", description="Books and literature"),
+            Category(id=CategoryId.new(), name="Clothing", description="Clothing and accessories")
+        ]
+        mock_repository.find_all.return_value = categories
+        
+        # Act
+        result = use_case.get_category_statistics()
+        
+        # Assert
+        assert isinstance(result, dict)
+        assert "total_count" in result
+        assert "average_name_length" in result
+        assert "longest_name" in result
+        assert "shortest_name" in result
+        assert result["total_count"] == 3
+        assert result["longest_name"] == "Electronics"
+        assert result["shortest_name"] == "Books"

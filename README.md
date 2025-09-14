@@ -7,6 +7,7 @@
 Полная документация доступна в директории [docs](docs/):
 
 - [Архитектура](docs/architecture.md)
+- [Руководство по разработке](docs/development.md)
 - [Установка и запуск](docs/installation.md)
 - [API документация](docs/api.md)
 - [Тестирование](docs/testing.md)
@@ -118,6 +119,7 @@ category-service/
 ├── docs/
 │   ├── index.md
 │   ├── architecture.md
+│   ├── development.md
 │   ├── installation.md
 │   ├── api.md
 │   ├── testing.md
@@ -220,6 +222,7 @@ docker-compose run --rm test-runner
 - `GET /categories/` - Получить все категории
 - `PUT /categories/{id}` - Обновить категорию
 - `DELETE /categories/{id}` - Удалить категорию
+- `GET /categories/statistics` - Получить статистику по категориям
 
 ## Лицензия
 

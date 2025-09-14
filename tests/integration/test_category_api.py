@@ -98,3 +98,30 @@ class TestCategoryAPI:
         assert response.status_code == 200
         data = response.json()
         assert "message" in data
+    
+    def test_get_category_statistics(self, client):
+        # Arrange
+        # Create a few categories first
+        categories_data = [
+            {"name": "Electronics", "description": "Electronic devices"},
+            {"name": "Books", "description": "Books and literature"},
+            {"name": "Clothing", "description": "Clothing and accessories"}
+        ]
+        
+        for category_data in categories_data:
+            client.post("/categories/", json=category_data)
+        
+        # Act
+        response = client.get("/categories/statistics")
+        
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert "total_count" in data
+        assert "average_name_length" in data
+        assert "longest_name" in data
+        assert "shortest_name" in data
+        assert data["total_count"] >= 3
+        assert isinstance(data["average_name_length"], (int, float))
+        assert isinstance(data["longest_name"], str)
+        assert isinstance(data["shortest_name"], str)

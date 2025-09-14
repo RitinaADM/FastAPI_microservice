@@ -4,7 +4,8 @@ from domain.exceptions.category_exceptions import CategoryNotFoundError, Invalid
 from infrastructure.adapters.inbound.rest.schemas.category_schemas import (
     CategoryCreateRequest,
     CategoryUpdateRequest,
-    CategoryResponse
+    CategoryResponse,
+    CategoryStatisticsResponse
 )
 from application.use_cases.category_use_case import CategoryUseCase
 from typing import List
@@ -13,7 +14,15 @@ from dishka.integrations.fastapi import FromDishka, inject
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 
-
+@router.get("/statistics", response_model=CategoryStatisticsResponse)
+@inject
+async def get_category_statistics(
+    use_case: FromDishka[CategoryUseCase]
+):
+    """Get statistics for all categories"""
+    statistics = use_case.get_category_statistics()
+    return CategoryStatisticsResponse(**statistics)
+    
 @router.get("/", response_model=List[CategoryResponse])
 @inject
 async def get_all_categories(
@@ -102,3 +111,5 @@ async def delete_category(
             raise HTTPException(status_code=500, detail="Failed to delete category")
     except CategoryNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+

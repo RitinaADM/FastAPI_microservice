@@ -4,7 +4,8 @@ from domain.ports.inbound.category_input_port import CategoryInputPort
 from domain.ports.outbound.category_repository import CategoryRepository
 from domain.ports.outbound.category_event_publisher import CategoryEventPublisher
 from domain.exceptions.category_exceptions import CategoryNotFoundError, InvalidCategoryError
-from typing import List, Optional
+from domain.services.category_service import CategoryService
+from typing import List, Optional, Dict, Any
 
 
 class CategoryUseCase(CategoryInputPort):
@@ -14,6 +15,7 @@ class CategoryUseCase(CategoryInputPort):
         self.repository = repository
         self.event_publisher = event_publisher
         self.cache_adapter = cache_adapter
+        self.category_service = CategoryService()
     
     def create_category(self, name: str, description: Optional[str] = None) -> Category:
         # Create category entity
@@ -130,3 +132,11 @@ class CategoryUseCase(CategoryInputPort):
             self.event_publisher.publish_category_deleted(category_id)
         
         return result
+    
+    def get_category_statistics(self) -> Dict[str, Any]:
+        """Get statistics for all categories"""
+        # Get all categories
+        categories = self.get_all_categories()
+        
+        # Calculate statistics using domain service
+        return self.category_service.calculate_category_statistics(categories)
