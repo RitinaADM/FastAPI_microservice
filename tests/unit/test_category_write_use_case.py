@@ -1,13 +1,8 @@
 import pytest
-from unittest.mock import Mock, MagicMock
-# Используем абсолютные пути импорта после настройки sys.path в conftest.py
+from unittest.mock import Mock
 from domain.entities.category import Category
 from domain.value_objects.category_id import CategoryId
-# Импортируем исключения точно так же, как это делает CategoryUseCase
 from domain.exceptions.category_exceptions import CategoryNotFoundError, InvalidCategoryError
-# Импортируем исключение, которое выбрасывает Category
-from src.domain.exceptions.category_exceptions import InvalidCategoryError as SrcInvalidCategoryError
-# Импортируем новый write use case вместо старого общего
 from application.use_cases.category_write_use_case import CategoryWriteUseCase
 
 
@@ -80,6 +75,17 @@ class TestCategoryWriteUseCase:
         # Act & Assert
         with pytest.raises(CategoryNotFoundError):
             use_case.update_category(category_id, "Name", "Desc")
+    
+    def test_update_category_invalid_name_raises_exception(self, use_case, mock_repository):
+        # Arrange
+        category_id = CategoryId.new()
+        existing_category = Category(id=category_id, name="Old Name", description="Old Desc")
+        mock_repository.find_by_id.return_value = existing_category
+        invalid_name = ""
+        
+        # Act & Assert
+        with pytest.raises(InvalidCategoryError):
+            use_case.update_category(category_id, invalid_name)
     
     def test_delete_category_success(self, use_case, mock_repository, mock_event_publisher):
         # Arrange

@@ -67,7 +67,10 @@
 
 Сценарии использования реализуют входящие порты и координируют работу доменных объектов и сервисов. Они управляют транзакциями, безопасностью и другими сквозными аспектами.
 
-Пример: [CategoryUseCase](file:///c:/Users/dev/Documents/ritina_app/src/application/use_cases/category_use_case.py#L11-L130) реализует все операции с категориями, координируя работу различных компонентов.
+Примеры:
+- [CategoryReadUseCase](file:///c:/Users/dev/Documents/ritina_app/src/application/use_cases/category_read_use_case.py#L7-L32) реализует операции чтения категорий
+- [CategoryWriteUseCase](file:///c:/Users/dev/Documents/ritina_app/src/application/use_cases/category_write_use_case.py#L7-L54) реализует операции записи категорий
+- [CategoryStatisticsUseCase](file:///c:/Users/dev/Documents/ritina_app/src/application/use_cases/category_statistics_use_case.py#L6-L15) реализует получение статистики по категориям
 
 В сценариях использования должна находиться логика координации, например:
 - Получение данных из репозитория
@@ -105,6 +108,7 @@ DTO используются для передачи данных между с�
 - [MongoCategoryRepository](file:///c:/Users/dev/Documents/ritina_app/src/infrastructure/adapters/outbound/database/mongodb/category_repository_impl.py#L7-L79) (MongoDB) - реализует хранение данных с методами create и update
 - [RabbitMQCategoryEventPublisher](file:///c:/Users/dev/Documents/ritina_app/src/infrastructure/adapters/outbound/message_bus/rabbitmq_publisher.py#L9-L87) (RabbitMQ) - реализует публикацию событий
 - [RedisCacheAdapter](file:///c:/Users/dev/Documents/ritina_app/src/infrastructure/adapters/outbound/cache/redis_adapter.py#L8-L84) (Redis) - реализует кэширование
+- [CachedCategoryRepository](file:///c:/Users/dev/Documents/ritina_app/src/infrastructure/adapters/outbound/cache/cached_category_repository.py#L8-L102) (декоратор) - добавляет кэширование к репозиторию
 
 ### Мапперы (Mappers)
 

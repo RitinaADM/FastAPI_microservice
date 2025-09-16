@@ -20,6 +20,9 @@ ritina_app/
 │       ├── adapters/        # Адаптеры
 │       │   ├── inbound/     # Входящие адаптеры
 │       │   └── outbound/    # Исходящие адаптеры
+│       │       ├── cache/   # Кэширующие адаптеры
+│       │       ├── database/ # Базы данных
+│       │       └── message_bus/ # Шина сообщений
 │       ├── config/          # Конфигурация
 │       ├── di/              # Внедрение зависимостей
 │       └── mappers/         # Мапперы
@@ -72,7 +75,9 @@ class CategoryService:
 - Сохраняют результаты через порты
 - Публикуют события при необходимости
 
-Пример: [CategoryUseCase](file:///c:/Users/dev/Documents/ritina_app/src/application/use_cases/category_use_case.py#L11-L130) координирует создание категории, вызывая валидацию в [CategoryService](file:///c:/Users/dev/Documents/ritina_app/src/domain/services/category_service.py#L6-L17), сохраняя данные через [CategoryRepository](file:///c:/Users/dev/Documents/ritina_app/src/domain/ports/outbound/category_repository.py#L6-L26) и публикуя события через [CategoryEventPublisher](file:///c:/Users/dev/Documents/ritina_app/src/domain/ports/outbound/category_event_publisher.py#L6-L17).
+Примеры:
+- [CategoryReadUseCase](file:///c:/Users/dev/Documents/ritina_app/src/application/use_cases/category_read_use_case.py#L7-L32) координирует чтение категорий из репозитория
+- [CategoryWriteUseCase](file:///c:/Users/dev/Documents/ritina_app/src/application/use_cases/category_write_use_case.py#L7-L54) координирует создание, обновление и удаление категорий, вызывая валидацию в [CategoryService](file:///c:/Users/dev/Documents/ritina_app/src/domain/services/category_service.py#L6-L17), сохраняя данные через [CategoryRepository](file:///c:/Users/dev/Documents/ritina_app/src/domain/ports/outbound/category_repository.py#L6-L26) и публикуя события через [CategoryEventPublisher](file:///c:/Users/dev/Documents/ritina_app/src/domain/ports/outbound/category_event_publisher.py#L6-L17).
 
 ### Доменные сервисы (Domain Services)
 
@@ -156,17 +161,12 @@ class ExampleDTO(BaseModel):
 ```python
 # src/application/use_cases/example_use_case.py
 class ExampleUseCase(ExampleInputPort):
-    def __init__(self, repository: ExampleRepository, example_service: ExampleService):
+    def __init__(self, repository: ExampleRepository):
         self.repository = repository
-        self.example_service = example_service
     
     def create_example(self, name: str) -> Example:
         # Координация: создание, валидация, сохранение
         example = Example(id=None, name=name)
-        
-        # Вызов доменного сервиса для валидации
-        if not self.example_service.validate_example(example):
-            raise InvalidExampleError("Example validation failed")
         
         # Сохранение через порт
         return self.repository.create(example)
@@ -212,10 +212,9 @@ class InteractorProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def provide_example_use_case(
         self,
-        repository: MongoExampleRepository,
-        example_service: ExampleService
+        repository: MongoExampleRepository
     ) -> ExampleUseCase:
-        return ExampleUseCase(repository, example_service)
+        return ExampleUseCase(repository)
 ```
 
 ### 6. Тестирование
@@ -224,7 +223,7 @@ class InteractorProvider(Provider):
 ```python
 # tests/unit/test_example_use_case.py
 class TestExampleUseCase:
-    def test_create_example_success(self, use_case, mock_repository, mock_example_service):
+    def test_create_example_success(self, use_case, mock_repository):
         # Тест создания примера
         pass
 ```
@@ -246,3 +245,4 @@ class TestExampleAPI:
 4. **Соблюдайте принципы гексагональной архитектуры**
 5. **Используйте типизацию для повышения надежности кода**
 6. **Пишите понятную документацию**
+7. **Разделяйте ответственность между слоями - бизнес-логика должна находиться в доменном слое, а не в инфраструктурном**

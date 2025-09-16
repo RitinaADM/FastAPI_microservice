@@ -1,3 +1,6 @@
+from domain.entities.category import Category
+
+
 from fastapi import APIRouter, HTTPException
 from domain.value_objects.category_id import CategoryId
 from domain.exceptions.category_exceptions import CategoryNotFoundError, InvalidCategoryError
@@ -7,7 +10,9 @@ from infrastructure.adapters.inbound.rest.schemas.category_schemas import (
     CategoryResponse,
     CategoryStatisticsResponse
 )
-from application.use_cases.category_use_case import CategoryUseCase
+from application.use_cases.category_read_use_case import CategoryReadUseCase
+from application.use_cases.category_write_use_case import CategoryWriteUseCase
+from application.use_cases.category_statistics_use_case import CategoryStatisticsUseCase
 from typing import List
 from dishka.integrations.fastapi import FromDishka, inject
 
@@ -17,7 +22,7 @@ router = APIRouter(prefix="/categories", tags=["categories"])
 @router.get("/statistics", response_model=CategoryStatisticsResponse)
 @inject
 async def get_category_statistics(
-    use_case: FromDishka[CategoryUseCase]
+    use_case: FromDishka[CategoryStatisticsUseCase]
 ):
     """Get statistics for all categories"""
     statistics = use_case.get_category_statistics()
@@ -26,13 +31,13 @@ async def get_category_statistics(
 @router.get("/", response_model=List[CategoryResponse])
 @inject
 async def get_all_categories(
-    use_case: FromDishka[CategoryUseCase]
+    use_case: FromDishka[CategoryReadUseCase]
 ):
     categories = use_case.get_all_categories()
     return [
         CategoryResponse(
             id=str(category.id),
-            name=category.name,
+            name=str(category.name),
             description=category.description
         )
         for category in categories
@@ -43,13 +48,13 @@ async def get_all_categories(
 @inject
 async def create_category(
     request: CategoryCreateRequest,
-    use_case: FromDishka[CategoryUseCase]
+    use_case: FromDishka[CategoryWriteUseCase]
 ):
     try:
-        category = use_case.create_category(request.name, request.description)
+        category: Category = use_case.create_category(request.name, request.description)
         return CategoryResponse(
             id=str(category.id),
-            name=category.name,
+            name=str(category.name),
             description=category.description
         )
     except InvalidCategoryError as e:
@@ -60,13 +65,13 @@ async def create_category(
 @inject
 async def get_category(
     category_id: str,
-    use_case: FromDishka[CategoryUseCase]
+    use_case: FromDishka[CategoryReadUseCase]
 ):
     try:
         category = use_case.get_category(CategoryId(category_id))
         return CategoryResponse(
             id=str(category.id),
-            name=category.name,
+            name=str(category.name),
             description=category.description
         )
     except CategoryNotFoundError as e:
@@ -78,7 +83,7 @@ async def get_category(
 async def update_category(
     category_id: str,
     request: CategoryUpdateRequest,
-    use_case: FromDishka[CategoryUseCase]
+    use_case: FromDishka[CategoryWriteUseCase]
 ):
     try:
         category = use_case.update_category(
@@ -88,7 +93,7 @@ async def update_category(
         )
         return CategoryResponse(
             id=str(category.id),
-            name=category.name,
+            name=str(category.name),
             description=category.description
         )
     except CategoryNotFoundError as e:
@@ -101,7 +106,7 @@ async def update_category(
 @inject
 async def delete_category(
     category_id: str,
-    use_case: FromDishka[CategoryUseCase]
+    use_case: FromDishka[CategoryWriteUseCase]
 ):
     try:
         result = use_case.delete_category(CategoryId(category_id))
@@ -111,5 +116,3 @@ async def delete_category(
             raise HTTPException(status_code=500, detail="Failed to delete category")
     except CategoryNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
-
-

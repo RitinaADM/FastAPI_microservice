@@ -40,6 +40,9 @@
 [Mapper: Domain Entities -> Internal DTO]
       |
       v
+[Cached Repository Decorator]
+      |
+      v
 [Outbound Adapter]
       |
       v
@@ -77,7 +80,9 @@ category-service/
 │
 ├── application/
 │   ├── use_cases/
-│   │   └── category_use_case.py
+│   │   ├── category_read_use_case.py
+│   │   ├── category_write_use_case.py
+│   │   └── category_statistics_use_case.py
 │   └── dtos/
 │       ├── category_dto.py
 │       ├── create_category_dto.py
@@ -98,7 +103,8 @@ category-service/
 │   │       ├── message_bus/
 │   │       │   └── rabbitmq_publisher.py
 │   │       └── cache/
-│   │           └── redis_adapter.py
+│   │           ├── redis_adapter.py
+│   │           └── cached_category_repository.py
 │   │
 │   ├── mappers/
 │   │   └── category_mappers.py
@@ -112,7 +118,10 @@ category-service/
 │
 ├── tests/
 │   ├── unit/
-│   │   └── test_category_use_case.py
+│   │   ├── test_category_read_use_case.py
+│   │   ├── test_category_write_use_case.py
+│   │   ├── test_category_statistics_use_case.py
+│   │   └── test_cached_category_repository.py
 │   └── integration/
 │   │   └── test_category_api.py
 │

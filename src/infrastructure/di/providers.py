@@ -2,7 +2,10 @@ from dishka import Provider, Scope, make_async_container, provide
 from infrastructure.adapters.outbound.database.mongodb.category_repository_impl import MongoCategoryRepository
 from infrastructure.adapters.outbound.message_bus.rabbitmq_publisher import RabbitMQCategoryEventPublisher
 from infrastructure.adapters.outbound.cache.redis_adapter import RedisCacheAdapter
-from application.use_cases.category_use_case import CategoryUseCase
+from infrastructure.adapters.outbound.cache.cached_category_repository import CachedCategoryRepository
+from application.use_cases.category_read_use_case import CategoryReadUseCase
+from application.use_cases.category_write_use_case import CategoryWriteUseCase
+from application.use_cases.category_statistics_use_case import CategoryStatisticsUseCase
 from infrastructure.config.settings import Settings
 import pika
 from urllib.parse import urlparse
@@ -42,13 +45,34 @@ class AdaptersProvider(Provider):
 
 class InteractorProvider(Provider):
     @provide(scope=Scope.REQUEST)
-    def provide_category_use_case(
+    def provide_category_read_use_case(
+        self,
+        cached_repository: CachedCategoryRepository
+    ) -> CategoryReadUseCase:
+        return CategoryReadUseCase(cached_repository)
+    
+    @provide(scope=Scope.REQUEST)
+    def provide_category_write_use_case(
+        self,
+        cached_repository: CachedCategoryRepository,
+        event_publisher: RabbitMQCategoryEventPublisher
+    ) -> CategoryWriteUseCase:
+        return CategoryWriteUseCase(cached_repository, event_publisher)
+    
+    @provide(scope=Scope.APP)
+    def provide_cached_category_repository(
         self,
         repository: MongoCategoryRepository,
-        event_publisher: RabbitMQCategoryEventPublisher,
         cache_adapter: RedisCacheAdapter
-    ) -> CategoryUseCase:
-        return CategoryUseCase(repository, event_publisher, cache_adapter)
+    ) -> CachedCategoryRepository:
+        return CachedCategoryRepository(repository, cache_adapter)
+    
+    @provide(scope=Scope.REQUEST)
+    def provide_category_statistics_use_case(
+        self,
+        read_use_case: CategoryReadUseCase
+    ) -> CategoryStatisticsUseCase:
+        return CategoryStatisticsUseCase(read_use_case)
 
 
 def get_container():
