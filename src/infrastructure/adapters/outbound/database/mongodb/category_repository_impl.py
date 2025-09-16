@@ -14,10 +14,15 @@ class MongoCategoryRepository(CategoryRepository):
         self.db = self.client[database_name]
         self.collection = self.db.categories
     
-    def save(self, category: Category) -> Category:
-        # If category has no ID, generate one
+    def create(self, category: Category) -> Category:
+        # Create should only create new categories
         if category.id is None:
             category.id = CategoryId.new()
+        else:
+            # If ID exists, check that category doesn't already exist
+            existing = self.collection.find_one({"_id": str(category.id)})
+            if existing:
+                raise ValueError(f"Category with id {category.id} already exists")
         
         # Convert to dict for MongoDB
         category_dict = {
@@ -26,12 +31,8 @@ class MongoCategoryRepository(CategoryRepository):
             "description": category.description
         }
         
-        # Save to MongoDB
-        self.collection.replace_one(
-            {"_id": str(category.id)},
-            category_dict,
-            upsert=True
-        )
+        # Insert new category
+        self.collection.insert_one(category_dict)
         
         return category
     
@@ -57,8 +58,14 @@ class MongoCategoryRepository(CategoryRepository):
         return categories
     
     def update(self, category: Category) -> Category:
+        # Update should only update existing categories
         if category.id is None:
             raise ValueError("Category ID is required for update")
+        
+        # Check that category exists
+        existing = self.collection.find_one({"_id": str(category.id)})
+        if not existing:
+            raise ValueError(f"Category with id {category.id} not found")
         
         category_dict = {
             "_id": str(category.id),
@@ -66,13 +73,11 @@ class MongoCategoryRepository(CategoryRepository):
             "description": category.description
         }
         
-        result = self.collection.replace_one(
+        # Update existing category
+        self.collection.replace_one(
             {"_id": str(category.id)},
             category_dict
         )
-        
-        if result.matched_count == 0:
-            raise ValueError(f"Category with id {category.id} not found")
         
         return category
     

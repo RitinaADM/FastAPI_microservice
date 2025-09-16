@@ -30,7 +30,7 @@ class TestCategoryUseCase:
         description = "Test Description"
         category_id = CategoryId.new()
         expected_category = Category(id=category_id, name=name, description=description)
-        mock_repository.save.return_value = expected_category
+        mock_repository.create.return_value = expected_category
         
         # Act
         result = use_case.create_category(name, description)
@@ -38,7 +38,7 @@ class TestCategoryUseCase:
         # Assert
         assert result.name == name
         assert result.description == description
-        mock_repository.save.assert_called_once()
+        mock_repository.create.assert_called_once()
         mock_event_publisher.publish_category_created.assert_called_once_with(expected_category)
     
     def test_create_category_invalid_name_raises_exception(self, use_case):

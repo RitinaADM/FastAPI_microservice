@@ -26,7 +26,7 @@ class CategoryUseCase(CategoryInputPort):
             raise InvalidCategoryError("Category name cannot be empty")
         
         # Save category
-        saved_category = self.repository.save(category)
+        saved_category = self.repository.create(category)
         
         # Clear cache for all categories
         if self.cache_adapter:

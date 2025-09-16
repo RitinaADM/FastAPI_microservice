@@ -169,7 +169,7 @@ class ExampleUseCase(ExampleInputPort):
             raise InvalidExampleError("Example validation failed")
         
         # Сохранение через порт
-        return self.repository.save(example)
+        return self.repository.create(example)
 ```
 
 ### 4. Реализация инфраструктурного слоя
@@ -178,8 +178,8 @@ class ExampleUseCase(ExampleInputPort):
 ```python
 # src/infrastructure/adapters/outbound/database/mongodb/example_repository_impl.py
 class MongoExampleRepository(ExampleRepository):
-    def save(self, example: Example) -> Example:
-        # Реализация сохранения в MongoDB
+    def create(self, example: Example) -> Example:
+        # Реализация создания в MongoDB
         pass
 ```
 

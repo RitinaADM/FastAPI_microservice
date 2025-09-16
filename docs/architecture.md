@@ -102,7 +102,7 @@ DTO используются для передачи данных между с�
 Исходящие адаптеры реализуют исходящие порты и взаимодействуют с внешними системами. Они преобразуют вызовы доменных портов в конкретные технологии.
 
 Примеры:
-- [MongoCategoryRepository](file:///c:/Users/dev/Documents/ritina_app/src/infrastructure/adapters/outbound/database/mongodb/category_repository_impl.py#L7-L79) (MongoDB) - реализует хранение данных
+- [MongoCategoryRepository](file:///c:/Users/dev/Documents/ritina_app/src/infrastructure/adapters/outbound/database/mongodb/category_repository_impl.py#L7-L79) (MongoDB) - реализует хранение данных с методами create и update
 - [RabbitMQCategoryEventPublisher](file:///c:/Users/dev/Documents/ritina_app/src/infrastructure/adapters/outbound/message_bus/rabbitmq_publisher.py#L9-L87) (RabbitMQ) - реализует публикацию событий
 - [RedisCacheAdapter](file:///c:/Users/dev/Documents/ritina_app/src/infrastructure/adapters/outbound/cache/redis_adapter.py#L8-L84) (Redis) - реализует кэширование
 
